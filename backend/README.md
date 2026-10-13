@@ -25,6 +25,27 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+## I&C agent
+
+The backend exposes a minimal I&C (Instrumentation & Control) commissioning
+agent at `POST /ic-agent/ask`, backed by OpenRouter through the official
+`openai` SDK.
+
+Environment (see `.env.example`):
+
+```
+OPENROUTER_API_KEY=
+OPENROUTER_MODEL=
+```
+
+Both are required — the app fails at startup if either is missing.
+
+```bash
+$ curl -s localhost:3000/ic-agent/ask \
+    -H 'content-type: application/json' \
+    -d '{"message":"What do we check in a 4-20 mA transmitter loop check?"}'
+```
+
 ## Project setup
 
 ```bash

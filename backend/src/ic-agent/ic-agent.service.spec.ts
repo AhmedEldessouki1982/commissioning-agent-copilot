@@ -1,38 +1,52 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ANTHROPIC_CLIENT } from './anthropic.provider';
 import { IC_AGENT_SYSTEM_PROMPT } from './ic-agent.prompt';
 import { IcAgentService } from './ic-agent.service';
+import { LLM_CLIENT } from './llm.provider';
 
 describe('IcAgentService', () => {
   let service: IcAgentService;
   const create = jest.fn();
+  const TEST_MODEL = 'test/model';
+  const previousModel = process.env.OPENROUTER_MODEL;
 
   beforeEach(async () => {
+    process.env.OPENROUTER_MODEL = TEST_MODEL;
     create.mockReset();
-    create.mockResolvedValue({ content: [{ type: 'text', text: 'hello' }] });
+    create.mockResolvedValue({ choices: [{ message: { content: 'hello' } }] });
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         IcAgentService,
-        { provide: ANTHROPIC_CLIENT, useValue: { messages: { create } } },
+        {
+          provide: LLM_CLIENT,
+          useValue: { chat: { completions: { create } } },
+        },
       ],
     }).compile();
 
     service = module.get<IcAgentService>(IcAgentService);
   });
 
-  it('returns the joined reply text and the model, and calls the API once', async () => {
-    const expectedModel = process.env.ANTHROPIC_MODEL ?? 'claude-sonnet-5-5';
+  afterAll(() => {
+    if (previousModel === undefined) {
+      delete process.env.OPENROUTER_MODEL;
+    } else {
+      process.env.OPENROUTER_MODEL = previousModel;
+    }
+  });
 
+  it('returns the reply content and the model, and calls the API once', async () => {
     const result = await service.ask('check loop');
 
-    expect(result).toEqual({ reply: 'hello', model: expectedModel });
+    expect(result).toEqual({ reply: 'hello', model: TEST_MODEL });
     expect(create).toHaveBeenCalledTimes(1);
     expect(create).toHaveBeenCalledWith({
-      model: expectedModel,
+      model: TEST_MODEL,
       max_tokens: 1024,
-      system: IC_AGENT_SYSTEM_PROMPT,
-      messages: [{ role: 'user', content: 'check loop' }],
+      messages: [
+        { role: 'system', content: IC_AGENT_SYSTEM_PROMPT },
+        { role: 'user', content: 'check loop' },
+      ],
     });
   });
 });
