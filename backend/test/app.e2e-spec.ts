@@ -3,7 +3,7 @@ import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
-import { LLM_CLIENT } from './../src/ic-agent/llm.provider';
+import { LLM_CLIENT } from './../src/llm/llm.provider';
 
 describe('HealthController (e2e)', () => {
   let app: INestApplication<App>;

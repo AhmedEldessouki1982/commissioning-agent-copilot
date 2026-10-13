@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
+import { LlmModule } from '../llm/llm.module';
 import { IcAgentController } from './ic-agent.controller';
 import { IcAgentService } from './ic-agent.service';
-import { llmClientProvider } from './llm.provider';
 
 @Module({
+  imports: [LlmModule],
   controllers: [IcAgentController],
-  providers: [IcAgentService, llmClientProvider],
+  providers: [IcAgentService],
 })
 export class IcAgentModule {}

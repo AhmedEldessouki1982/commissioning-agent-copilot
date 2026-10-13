@@ -1,0 +1,69 @@
+import {
+  BadGatewayException,
+  Inject,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
+import type OpenAI from 'openai';
+import { LLM_CLIENT } from './llm.provider';
+
+export interface LlmCompletionRequest {
+  system: string;
+  message: string;
+}
+
+export interface LlmCompletionResult {
+  reply: string;
+  model: string;
+}
+
+/**
+ * Single entry point to the LLM. Every call is independent — no history, no
+ * streaming, no tools — and any provider failure is normalised to a clean
+ * BadGatewayException so callers never see raw SDK errors or credentials.
+ */
+@Injectable()
+export class LlmService {
+  private readonly logger = new Logger(LlmService.name);
+
+  constructor(@Inject(LLM_CLIENT) private readonly client: OpenAI) {}
+
+  async complete({
+    system,
+    message,
+  }: LlmCompletionRequest): Promise<LlmCompletionResult> {
+    // Validated at startup by the provider; re-read here for a strict type.
+    const model = process.env.OPENROUTER_MODEL;
+    if (!model) {
+      throw new Error('OPENROUTER_MODEL is not set');
+    }
+
+    try {
+      const response = await this.client.chat.completions.create({
+        model,
+        max_tokens: 1024,
+        messages: [
+          { role: 'system', content: system },
+          { role: 'user', content: message },
+        ],
+      });
+
+      const reply = response.choices[0]?.message?.content ?? '';
+      if (!reply) {
+        throw new BadGatewayException('AI provider error');
+      }
+
+      return { reply, model };
+    } catch (error) {
+      // Already normalised (empty completion) — rethrow without re-logging.
+      if (error instanceof BadGatewayException) {
+        throw error;
+      }
+      this.logger.error(
+        'OpenRouter request failed',
+        error instanceof Error ? error.message : String(error),
+      );
+      throw new BadGatewayException('AI provider error');
+    }
+  }
+}
