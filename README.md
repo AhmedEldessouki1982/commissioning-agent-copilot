@@ -4,15 +4,15 @@ Phase 1 of a commissioning multi-agent system: a **sci-fi HUD dashboard** that v
 the agent architecture, its skills and contracts, and the live pulse traffic between agents.
 
 Phase 1 is **frontend-first** and fully self-contained — it runs on a mock simulator. The
-NestJS backend is a scaffold with a single health endpoint; in Phase 2 it replaces the
-simulator as the real pulse/state source over WebSocket/SSE.
+NestJS backend provides a health endpoint plus the first AI agent (I&C). In Phase 2 it
+replaces the simulator as the real pulse/state source over WebSocket/SSE.
 
 ## Structure
 
 ```
 .
 ├── frontend/   React + Vite + TypeScript + Tailwind v4 + shadcn/ui + Framer Motion
-└── backend/    NestJS scaffold — GET /health + CORS
+└── backend/    NestJS API — GET /health + POST /ic-agent/ask
 ```
 
 The domain contract (`Agent`, `Skill`, `Contract`, `PulseEvent`, …) lives in
@@ -27,12 +27,39 @@ The domain contract (`Agent`, `Skill`, `Contract`, `PulseEvent`, …) lives in
 
 ```bash
 pnpm install
+cp backend/.env.example backend/.env   # then fill in your OpenRouter credentials
 pnpm dev            # frontend at http://localhost:5173
 pnpm backend:dev    # backend  at http://localhost:3000
 ```
 
 The backend exposes `GET /health` and allows CORS from `http://localhost:5173`
 (override with `FRONTEND_ORIGIN`).
+
+## Backend I&C agent
+
+The backend exposes a minimal I&C (Instrumentation & Control) commissioning agent at
+`POST /ic-agent/ask`, backed by [OpenRouter](https://openrouter.ai) through the official
+`openai` SDK. It always answers under four headings — Findings / Assumptions / Open items /
+References — and never invents tag numbers, setpoints or document numbers.
+
+Both variables below are required; the app fails at startup if either is missing
+(see `backend/.env.example`):
+
+```
+OPENROUTER_API_KEY=
+OPENROUTER_MODEL=
+```
+
+```bash
+curl -s localhost:3000/ic-agent/ask \
+  -H 'content-type: application/json' \
+  -d '{"message":"What do we check in a 4-20 mA transmitter loop check?"}'
+# → { "reply": "...", "model": "..." }
+```
+
+`message` must be a non-empty string of at most 4000 characters; invalid input returns
+`400`, and any provider error returns a clean `502` (`AI provider error`) with no API key
+or raw error leaked to the client.
 
 ## Terminal theme sync
 
@@ -63,4 +90,4 @@ Backend-level: `pnpm --filter backend lint|test|test:e2e|build`.
 - Replace `frontend/src/mock/simulator.ts` with a real WebSocket/SSE transport.
 - Backend owns agent state and broadcasts `PulseEvent`s on the shared contract.
 - Persist activity log, contracts, and skills.
-# commissioning-agent-copilot
+- Add the remaining agents (Mech, Elec, …) alongside the I&C agent.
