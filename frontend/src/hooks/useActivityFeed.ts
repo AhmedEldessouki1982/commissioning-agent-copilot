@@ -36,6 +36,7 @@ export function useActivityFeed(labelFor: (id: string) => string): ActivityFeed 
     const offDeparture = pulseBus.on((event) => {
       if (event.type === 'idle') return // heartbeats stay out of the log
       if (event.type === 'dispatch') setDispatched((n) => n + 1)
+      if (event.type === 'result') setCompleted((n) => n + 1)
       setEntries((prev) =>
         [{ id: event.id, at: event.at, text: render(event), type: event.type }, ...prev].slice(
           0,
@@ -44,13 +45,8 @@ export function useActivityFeed(labelFor: (id: string) => string): ActivityFeed 
       )
     })
 
-    const offArrival = pulseBus.onArrival((event) => {
-      if (event.type === 'result') setCompleted((n) => n + 1)
-    })
-
     return () => {
       offDeparture()
-      offArrival()
     }
   }, [])
 

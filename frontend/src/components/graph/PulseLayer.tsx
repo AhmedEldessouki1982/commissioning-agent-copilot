@@ -33,6 +33,9 @@ interface ActivePulse {
   style: PulseStyle
 }
 
+/** Upper bound on simultaneously rendered pulses (older ones are dropped). */
+const ACTIVE_CAP = 32
+
 /**
  * Renders travelling pulses as glowing dots with a fading comet trail, using
  * native SVG `animateMotion` (precise direction control + no per-frame JS).
@@ -41,21 +44,27 @@ interface ActivePulse {
 export function PulseLayer(): ReactNode {
   const [active, setActive] = useState<ActivePulse[]>([])
   const reduced = usePrefersReducedMotion()
-  const timers = useRef(new Set<ReturnType<typeof setTimeout>>())
+  const timers = useRef(new Map<string, ReturnType<typeof setTimeout>>())
 
   const settle = useCallback((event: PulseEvent, delayMs: number): void => {
     const timer = setTimeout(() => {
-      timers.current.delete(timer)
+      timers.current.delete(event.id)
       setActive((prev) => prev.filter((p) => p.event.id !== event.id))
       pulseBus.emitArrival(event)
     }, delayMs)
-    timers.current.add(timer)
+    timers.current.set(event.id, timer)
   }, [])
 
   usePulseEvents((event) => {
     const route = pulseRoute(event.from, event.to)
-    if (!route) return
-    const style = STYLE[event.type]
+    const hidden = typeof document !== 'undefined' && document.hidden
+
+    // No route, or an unrendered/throttled tab: settle at once with no
+    // animation so arrivals never hang waiting on a frame that won't come.
+    if (!route || hidden) {
+      settle(event, 0)
+      return
+    }
 
     if (reduced) {
       // No travel under reduced motion — resolve with a short beat so status
@@ -64,7 +73,9 @@ export function PulseLayer(): ReactNode {
       return
     }
 
-    setActive((prev) => [...prev.slice(-24), { event, path: route.path, reverse: route.reverse, style }])
+    // Cap the rendered list; dropped pulses still settle via their own timer.
+    setActive((prev) => [...prev, { event, path: route.path, reverse: route.reverse, style: STYLE[event.type] }].slice(-ACTIVE_CAP))
+    const style = STYLE[event.type]
     const trailing = (style.dots - 1) * style.duration * style.spread
     settle(event, style.duration * 1000 + trailing * 1000 + 120)
   })
@@ -72,7 +83,7 @@ export function PulseLayer(): ReactNode {
   useEffect(() => {
     const pending = timers.current
     return () => {
-      for (const timer of pending) clearTimeout(timer)
+      for (const timer of pending.values()) clearTimeout(timer)
       pending.clear()
     }
   }, [])

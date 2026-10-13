@@ -1,32 +1,36 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useReducer, useState } from 'react'
 import { pulseBus } from '@/lib/pulse-bus'
+import { createRuntimeState, reduce } from '@/lib/runtime-reducer'
 import type { Agent, AgentStatus } from '@/types/agents'
 
 export interface AgentRuntime {
   /** Live status per agent id (overrides the static seed). */
   statuses: Record<string, AgentStatus>
-  /** Ids currently showing an arrival ripple. */
+  /** Ids currently showing an arrival ripple (purely visual). */
   flashing: ReadonlySet<string>
 }
 
 const RIPPLE_MS = 720
 
 /**
- * Derives live agent status + arrival flashes purely from bus events.
- * Nothing here talks to the visuals directly — it only listens.
+ * Derives live agent status from the pure runtime reducer, fed *only* by pulse
+ * departures. Arrivals drive the ripple flash, which is cosmetic — losing an
+ * arrival (hidden tab, missing route, reduced motion) can never drift status.
  */
 export function useAgentRuntime(agents: readonly Agent[]): AgentRuntime {
-  const [statuses, setStatuses] = useState<Record<string, AgentStatus>>(() =>
-    Object.fromEntries(agents.map((a) => [a.id, a.status])),
-  )
+  const [state, dispatch] = useReducer(reduce, agents, createRuntimeState)
   const [flashing, setFlashing] = useState<ReadonlySet<string>>(() => new Set<string>())
 
   useEffect(() => {
     const timers = new Set<ReturnType<typeof setTimeout>>()
 
     const offDeparture = pulseBus.on((event) => {
+      if (event.taskId === undefined) return
+      const taskId = String(event.taskId)
       if (event.type === 'dispatch') {
-        setStatuses((prev) => ({ ...prev, [event.from]: 'busy' }))
+        dispatch({ type: 'dispatch', agentId: event.to, taskId })
+      } else if (event.type === 'result') {
+        dispatch({ type: 'result', agentId: event.from, taskId })
       }
     })
 
@@ -41,21 +45,17 @@ export function useAgentRuntime(agents: readonly Agent[]): AgentRuntime {
         })
       }, RIPPLE_MS)
       timers.add(timer)
-
-      if (event.type === 'dispatch') {
-        setStatuses((prev) => ({ ...prev, [event.to]: 'busy' }))
-      }
-      if (event.type === 'result') {
-        setStatuses((prev) => ({ ...prev, [event.to]: 'idle', [event.from]: 'idle' }))
-      }
     })
+
+    const offReset = pulseBus.onReset(() => dispatch({ type: 'reset' }))
 
     return () => {
       offDeparture()
       offArrival()
+      offReset()
       for (const timer of timers) clearTimeout(timer)
     }
   }, [])
 
-  return { statuses, flashing }
+  return { statuses: state.statuses, flashing }
 }

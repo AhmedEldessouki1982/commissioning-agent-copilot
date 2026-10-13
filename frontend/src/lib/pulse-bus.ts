@@ -10,6 +10,7 @@ export interface PulseInput {
 }
 
 export type PulseListener = (event: PulseEvent) => void
+export type ResetListener = () => void
 
 let sequence = 0
 
@@ -23,6 +24,7 @@ let sequence = 0
 export class PulseBus {
   private departureListeners = new Set<PulseListener>()
   private arrivalListeners = new Set<PulseListener>()
+  private resetListeners = new Set<ResetListener>()
 
   emit(input: PulseInput): PulseEvent {
     sequence += 1
@@ -52,6 +54,21 @@ export class PulseBus {
     this.arrivalListeners.add(listener)
     return () => {
       this.arrivalListeners.delete(listener)
+    }
+  }
+
+  /**
+   * Requests a clean settle (feed paused/restarted, teardown). Subscribers
+   * clear all derived state so no agent is left busy after the feed stops.
+   */
+  reset(): void {
+    for (const listener of this.resetListeners) listener()
+  }
+
+  onReset(listener: ResetListener): () => void {
+    this.resetListeners.add(listener)
+    return () => {
+      this.resetListeners.delete(listener)
     }
   }
 }
