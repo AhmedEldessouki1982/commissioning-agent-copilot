@@ -8,6 +8,7 @@ import { Background } from '@/components/hud/Background'
 import { useActivityFeed } from '@/hooks/useActivityFeed'
 import { useAgentRuntime } from '@/hooks/useAgentRuntime'
 import { useEmitPulse } from '@/hooks/usePulseBus'
+import { pulseBus } from '@/lib/pulse-bus'
 import { AGENTS_BY_ID, ENGINEER_IDS, MANAGER_ID, agents } from '@/mock/architecture'
 import { createSimulator, type Simulator } from '@/mock/simulator'
 
@@ -18,6 +19,7 @@ export default function App(): ReactNode {
   const [target, setTarget] = useState<DrawerTarget | null>(null)
 
   const emit = useEmitPulse()
+  const reset = useCallback(() => pulseBus.reset(), [])
   const { statuses, flashing } = useAgentRuntime(agents)
   const labelFor = useCallback((id: string) => AGENTS_BY_ID[id]?.shortName ?? id, [])
   const { entries, dispatched, completed } = useActivityFeed(labelFor)
@@ -25,13 +27,13 @@ export default function App(): ReactNode {
   const simulatorRef = useRef<Simulator | null>(null)
 
   useEffect(() => {
-    const simulator = createSimulator({ managerId: MANAGER_ID, agentIds: ENGINEER_IDS, emit })
+    const simulator = createSimulator({ managerId: MANAGER_ID, agentIds: ENGINEER_IDS, emit, onReset: reset })
     simulatorRef.current = simulator
     return () => {
       simulator.stop()
       simulatorRef.current = null
     }
-  }, [emit])
+  }, [emit, reset])
 
   useEffect(() => {
     const simulator = simulatorRef.current
@@ -41,9 +43,8 @@ export default function App(): ReactNode {
   }, [simulatorOn])
 
   const handleManualDispatch = useCallback(() => {
-    const to = ENGINEER_IDS[Math.floor(Math.random() * ENGINEER_IDS.length)]
-    if (to !== undefined) emit({ from: MANAGER_ID, to, type: 'dispatch' })
-  }, [emit])
+    simulatorRef.current?.dispatchTo()
+  }, [])
 
   const activeAgents = useMemo(
     () => Object.values(statuses).filter((status) => status === 'busy').length,
