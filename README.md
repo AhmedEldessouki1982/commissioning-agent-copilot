@@ -20,7 +20,7 @@ The domain contract (`Agent`, `Skill`, `Contract`, `PulseEvent`, …) lives in
 
 ## Prerequisites
 
-- Node.js >= 20
+- Node.js >= 20.12
 - [pnpm](https://pnpm.io) (repo is pinned to `pnpm@11.7.0` via `packageManager`)
 
 ## Getting started
@@ -33,7 +33,9 @@ pnpm backend:dev    # backend  at http://localhost:3000
 ```
 
 The backend exposes `GET /health` and allows CORS from `http://localhost:5173`
-(override with `FRONTEND_ORIGIN`).
+(override with `FRONTEND_ORIGIN`). It binds to `127.0.0.1` by default; set `HOST`
+(e.g. `HOST=0.0.0.0`) to change the bind address. Note that `0.0.0.0` exposes the
+API to your LAN — and potentially beyond it — so use it only when intended.
 
 ## Backend I&C agent
 
