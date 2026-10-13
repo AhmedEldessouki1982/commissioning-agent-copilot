@@ -1,0 +1,11 @@
+packages:
+  - frontend
+  - backend
+
+# Native/postinstall builds explicitly approved (pnpm v11 security default).
+allowBuilds:
+  '@parcel/watcher': true
+  unrs-resolver: true
+
+# Don't re-run install before every script (our scripts chain theme:sync explicitly).
+verifyDepsBeforeRun: false

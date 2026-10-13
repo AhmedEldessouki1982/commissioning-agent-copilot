@@ -1,0 +1,394 @@
+/* ==========================================================================
+   HUD primitives styling. Colors come exclusively from the generated theme
+   variables (--accent, --border, --glass, ...). No hardcoded hex.
+   ========================================================================== */
+
+/* ---------- HudFrame ----------------------------------------------------- */
+.hud-frame {
+  position: relative;
+  border: 1px solid color-mix(in oklab, var(--accent) 22%, var(--border));
+  border-radius: var(--radius);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--card) 90%, transparent),
+      color-mix(in oklab, var(--bg) 76%, transparent)
+    );
+  backdrop-filter: blur(6px);
+}
+
+.hud-frame--glow {
+  border-color: color-mix(in oklab, var(--accent) 55%, var(--border));
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--accent) 16%, transparent),
+    0 0 18px -2px var(--accent-glow),
+    inset 0 0 24px -16px var(--accent-glow);
+}
+
+.hud-frame--interactive {
+  cursor: pointer;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+.hud-frame--interactive:hover {
+  border-color: color-mix(in oklab, var(--accent) 70%, var(--border));
+  box-shadow: 0 0 16px -4px var(--accent-glow);
+}
+
+/* corner brackets */
+.hud-corner {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-color: var(--accent);
+  opacity: 0.9;
+  pointer-events: none;
+  filter: drop-shadow(0 0 3px var(--accent-glow));
+}
+.hud-corner--tl {
+  top: -1px;
+  left: -1px;
+  border-top: 2px solid;
+  border-left: 2px solid;
+}
+.hud-corner--tr {
+  top: -1px;
+  right: -1px;
+  border-top: 2px solid;
+  border-right: 2px solid;
+}
+.hud-corner--bl {
+  bottom: -1px;
+  left: -1px;
+  border-bottom: 2px solid;
+  border-left: 2px solid;
+}
+.hud-corner--br {
+  bottom: -1px;
+  right: -1px;
+  border-bottom: 2px solid;
+  border-right: 2px solid;
+}
+
+/* subtle scanline overlay */
+.hud-scanlines {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0 2px,
+    var(--scanline) 2px 3px
+  );
+  opacity: 0.45;
+  mix-blend-mode: overlay;
+  animation: hud-scan 8s linear infinite;
+}
+
+@keyframes hud-scan {
+  to {
+    background-position: 0 6px;
+  }
+}
+
+/* ---------- StatusChip --------------------------------------------------- */
+.hud-dot {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--dot-color, var(--accent));
+  box-shadow: 0 0 8px var(--dot-color, var(--accent));
+}
+.hud-dot::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 9999px;
+  border: 1px solid var(--dot-color, var(--accent));
+  animation: hud-dot-ripple 2s ease-out infinite;
+  opacity: 0.7;
+}
+.hud-dot--static::after {
+  content: none;
+}
+
+@keyframes hud-dot-ripple {
+  from {
+    transform: scale(0.6);
+    opacity: 0.8;
+  }
+  to {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+
+/* ---------- GlitchText --------------------------------------------------- */
+.glitch {
+  position: relative;
+  display: inline-block;
+}
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.glitch::before {
+  color: var(--pulse-result);
+  transform: translate(1px, -1px);
+  clip-path: inset(0 0 58% 0);
+  animation: hud-glitch-a 3.4s steps(2, end) infinite;
+  opacity: 0.55;
+}
+.glitch::after {
+  color: var(--pulse-idle);
+  transform: translate(-1px, 1px);
+  clip-path: inset(58% 0 0 0);
+  animation: hud-glitch-b 2.9s steps(2, end) infinite;
+  opacity: 0.55;
+}
+
+@keyframes hud-glitch-a {
+  0%,
+  92%,
+  100% {
+    transform: translate(1px, -1px);
+    opacity: 0;
+  }
+  93% {
+    transform: translate(-2px, 1px);
+    opacity: 0.6;
+  }
+  96% {
+    transform: translate(2px, 0);
+    opacity: 0.5;
+  }
+}
+@keyframes hud-glitch-b {
+  0%,
+  90%,
+  100% {
+    transform: translate(-1px, 1px);
+    opacity: 0;
+  }
+  91% {
+    transform: translate(2px, -1px);
+    opacity: 0.6;
+  }
+  95% {
+    transform: translate(-2px, 0);
+    opacity: 0.5;
+  }
+}
+
+/* ---------- Background --------------------------------------------------- */
+.hud-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.hud-bg__grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 44px 44px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 38%, #000 10%, transparent 80%);
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 38%, #000 10%, transparent 80%);
+  opacity: 0.6;
+}
+.hud-bg__glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(120% 70% at 50% -10%, var(--accent-glow-soft), transparent 62%);
+}
+.hud-bg__vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 50% 45%,
+    transparent 42%,
+    color-mix(in oklab, var(--bg) 90%, #000) 100%
+  );
+}
+.hud-bg__noise {
+  position: absolute;
+  inset: 0;
+  opacity: 0.04;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---------- sci-fi backdrop layers -------------------------------------- */
+/* Deep two-tone nebula wash (accent + result hues) for depth. */
+.hud-bg__nebula {
+  position: absolute;
+  inset: -10%;
+  background:
+    radial-gradient(54% 46% at 12% 16%, color-mix(in oklab, var(--pulse-result) 22%, transparent), transparent 64%),
+    radial-gradient(50% 44% at 86% 82%, color-mix(in oklab, var(--accent) 32%, transparent), transparent 66%),
+    radial-gradient(72% 58% at 50% 122%, color-mix(in oklab, var(--pulse-idle) 20%, transparent), transparent 72%);
+  filter: blur(4px);
+}
+/* Slow rotating radar sweep behind everything. */
+.hud-bg__radar {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 150vmax;
+  height: 150vmax;
+  transform: translate(-50%, -50%) rotate(0deg);
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    color-mix(in oklab, var(--accent) 24%, transparent) 22deg,
+    transparent 54deg,
+    transparent 360deg
+  );
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 0%, transparent 70%);
+  mask-image: radial-gradient(circle at 50% 50%, #000 0%, transparent 70%);
+  opacity: 0.9;
+  animation: hud-radar 9s linear infinite;
+}
+@keyframes hud-radar {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+/* Particle constellation (canvas, drawn with terminal colors). */
+.hud-bg__particles {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.9;
+}
+/* Faint CRT scanlines. */
+.hud-bg__scanlines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0 2px,
+    var(--scanline) 2px 3px
+  );
+  opacity: 0.7;
+  mix-blend-mode: overlay;
+}
+/* A soft luminous band drifting down the screen. */
+.hud-bg__scan {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 160px;
+  top: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    color-mix(in oklab, var(--accent) 22%, transparent),
+    transparent
+  );
+  opacity: 0.8;
+  animation: hud-scan 6s ease-in-out infinite;
+}
+@keyframes hud-scan {
+  0% {
+    transform: translateY(-30vh);
+  }
+  100% {
+    transform: translateY(130vh);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hud-bg__radar,
+  .hud-bg__scan {
+    display: none;
+  }
+}
+
+/* ---------- node arrival ripple ----------------------------------------- */
+.node-ripple {
+  position: absolute;
+  inset: -6px;
+  border-radius: calc(var(--radius) + 6px);
+  border: 1px solid var(--accent);
+  box-shadow: 0 0 14px -2px var(--accent-glow);
+  pointer-events: none;
+  animation: hud-node-ripple 0.72s ease-out forwards;
+}
+@keyframes hud-node-ripple {
+  from {
+    transform: scale(0.97);
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(1.14);
+    opacity: 0;
+  }
+}
+
+/* ---------- graph edges -------------------------------------------------- */
+.graph-connector {
+  fill: none;
+  stroke: color-mix(in oklab, var(--fg) 16%, transparent);
+  stroke-width: 1;
+  stroke-dasharray: 2 5;
+}
+
+.graph-edge {
+  fill: none;
+  stroke: color-mix(in oklab, var(--accent) 38%, var(--border));
+  stroke-width: 1.5;
+}
+
+.graph-edge-flow {
+  fill: none;
+  stroke: color-mix(in oklab, var(--accent) 70%, transparent);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-dasharray: 3 26;
+  filter: drop-shadow(0 0 3px var(--accent-glow));
+  animation: graph-flow 3.6s linear infinite;
+}
+
+@keyframes graph-flow {
+  to {
+    stroke-dashoffset: -58;
+  }
+}
+
+.graph-edge-label {
+  fill: var(--muted-foreground);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  paint-order: stroke;
+  stroke: var(--bg);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+
+/* ---------- terminal activity log --------------------------------------- */
+.hud-log-line {
+  animation: hud-log-in 240ms ease-out;
+}
+@keyframes hud-log-in {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

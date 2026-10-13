@@ -1,0 +1,20 @@
+{
+  "name": "agent-orchestra",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Multi-agent system for commissioning engineering. Phase 1: sci-fi HUD frontend.",
+  "packageManager": "pnpm@11.7.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "pnpm --filter frontend dev",
+    "build": "pnpm --filter frontend build",
+    "preview": "pnpm --filter frontend preview",
+    "theme:sync": "pnpm --filter frontend theme:sync",
+    "lint": "pnpm -r --if-present lint",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "backend:dev": "pnpm --filter backend start:dev",
+    "backend:build": "pnpm --filter backend build"
+  }
+}
