@@ -7,5 +7,6 @@ import { ElecAgentService } from './elec-agent.service';
   imports: [LlmModule],
   controllers: [ElecAgentController],
   providers: [ElecAgentService],
+  exports: [ElecAgentService],
 })
 export class ElecAgentModule {}

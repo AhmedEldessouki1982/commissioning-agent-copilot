@@ -7,5 +7,6 @@ import { IcAgentService } from './ic-agent.service';
   imports: [LlmModule],
   controllers: [IcAgentController],
   providers: [IcAgentService],
+  exports: [IcAgentService],
 })
 export class IcAgentModule {}

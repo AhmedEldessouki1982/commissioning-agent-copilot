@@ -31,6 +31,13 @@ describe('HealthController (e2e)', () => {
       });
   });
 
+  it('/manager/ask (POST) rejects an empty message', () => {
+    return request(app.getHttpServer())
+      .post('/manager/ask')
+      .send({ message: '' })
+      .expect(400);
+  });
+
   afterEach(async () => {
     await app.close();
   });

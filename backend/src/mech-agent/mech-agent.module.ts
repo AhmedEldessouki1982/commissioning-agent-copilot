@@ -7,5 +7,6 @@ import { MechAgentService } from './mech-agent.service';
   imports: [LlmModule],
   controllers: [MechAgentController],
   providers: [MechAgentService],
+  exports: [MechAgentService],
 })
 export class MechAgentModule {}
