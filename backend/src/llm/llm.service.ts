@@ -25,6 +25,7 @@ const PROVIDER_ERROR = 'AI provider error';
  * streaming, no tools — and any provider failure is normalised to a clean
  * BadGatewayException so callers never see raw SDK errors or credentials.
  */
+
 @Injectable()
 export class LlmService {
   private readonly logger = new Logger(LlmService.name);
