@@ -93,15 +93,21 @@ current terminal.
 | --- | --- |
 | `pnpm dev` | Sync theme + run the frontend dev server |
 | `pnpm build` | Sync theme + type-check + build the frontend |
+| `pnpm lint` | Lint every workspace package (oxlint + ESLint) |
+| `pnpm typecheck` | Type-check every workspace package |
+| `pnpm test` | Run every workspace test suite (Vitest + Jest) |
 | `pnpm theme:sync` | Regenerate the theme from the terminal palette |
 | `pnpm backend:dev` | Run the NestJS backend in watch mode |
 
-Frontend-level: `pnpm --filter frontend typecheck`, `pnpm --filter frontend build`.
+Frontend-level: `pnpm --filter frontend lint|test|typecheck|build`.
 Backend-level: `pnpm --filter backend lint|test|test:e2e|build`.
 
 ## Phase 2 (planned)
 
 - Replace `frontend/src/mock/simulator.ts` with a real WebSocket/SSE transport.
-- Backend owns agent state and broadcasts `PulseEvent`s on the shared contract.
+- Backend owns agent state and broadcasts `PulseEvent`s on the shared contract. The
+  frontend feeds every received event to `pulseBus.ingest(event)`; `ingest` and the
+  simulator's `emit` share one delivery path, and `ingest` preserves the event's
+  `id`/`at` untouched (repeat ids are dropped).
 - Persist activity log, contracts, and skills.
 - Add further specialist agents on the shared `AgentService` / `AgentController` bases.
