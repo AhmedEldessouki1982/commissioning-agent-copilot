@@ -17,6 +17,9 @@ export interface LlmCompletionResult {
   model: string;
 }
 
+const MAX_TOKENS = 1024;
+const PROVIDER_ERROR = 'AI provider error';
+
 /**
  * Single entry point to the LLM. Every call is independent — no history, no
  * streaming, no tools — and any provider failure is normalised to a clean
@@ -41,7 +44,7 @@ export class LlmService {
     try {
       const response = await this.client.chat.completions.create({
         model,
-        max_tokens: 1024,
+        max_tokens: MAX_TOKENS,
         messages: [
           { role: 'system', content: system },
           { role: 'user', content: message },
@@ -49,21 +52,17 @@ export class LlmService {
       });
 
       const reply = response.choices[0]?.message?.content ?? '';
-      if (!reply) {
-        throw new BadGatewayException('AI provider error');
+      if (reply) {
+        return { reply, model };
       }
-
-      return { reply, model };
+      this.logger.error('OpenRouter returned an empty completion');
     } catch (error) {
-      // Already normalised (empty completion) — rethrow without re-logging.
-      if (error instanceof BadGatewayException) {
-        throw error;
-      }
       this.logger.error(
         'OpenRouter request failed',
         error instanceof Error ? error.message : String(error),
       );
-      throw new BadGatewayException('AI provider error');
     }
+
+    throw new BadGatewayException(PROVIDER_ERROR);
   }
 }

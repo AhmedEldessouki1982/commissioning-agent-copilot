@@ -1,17 +1,10 @@
-import { Body, Controller, Post } from '@nestjs/common';
-import { validateMessage } from '../common/validate-message';
-import { ElecAgentService, type ElecAgentReply } from './elec-agent.service';
-
-export interface ElecAgentAskBody {
-  message?: unknown;
-}
+import { Controller } from '@nestjs/common';
+import { AgentController } from '../agents/agent.controller';
+import { ElecAgentService } from './elec-agent.service';
 
 @Controller('elec-agent')
-export class ElecAgentController {
-  constructor(private readonly service: ElecAgentService) {}
-
-  @Post('ask')
-  async ask(@Body() body: ElecAgentAskBody): Promise<ElecAgentReply> {
-    return this.service.ask(validateMessage(body));
+export class ElecAgentController extends AgentController {
+  constructor(service: ElecAgentService) {
+    super(service);
   }
 }

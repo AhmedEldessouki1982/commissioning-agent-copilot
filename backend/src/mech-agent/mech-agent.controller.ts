@@ -1,17 +1,10 @@
-import { Body, Controller, Post } from '@nestjs/common';
-import { validateMessage } from '../common/validate-message';
-import { MechAgentService, type MechAgentReply } from './mech-agent.service';
-
-export interface MechAgentAskBody {
-  message?: unknown;
-}
+import { Controller } from '@nestjs/common';
+import { AgentController } from '../agents/agent.controller';
+import { MechAgentService } from './mech-agent.service';
 
 @Controller('mech-agent')
-export class MechAgentController {
-  constructor(private readonly service: MechAgentService) {}
-
-  @Post('ask')
-  async ask(@Body() body: MechAgentAskBody): Promise<MechAgentReply> {
-    return this.service.ask(validateMessage(body));
+export class MechAgentController extends AgentController {
+  constructor(service: MechAgentService) {
+    super(service);
   }
 }
