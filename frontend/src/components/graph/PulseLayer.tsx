@@ -3,7 +3,7 @@ import { usePulseEvents } from '@/hooks/usePulseBus'
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion'
 import { pulseBus } from '@/lib/pulse-bus'
 import { pulseRoute } from './layout'
-import type { PulseEvent, PulseType } from '@/types/agents'
+import type { PulseEvent, PulseType } from '@orchestra/contract'
 
 interface PulseStyle {
   color: string

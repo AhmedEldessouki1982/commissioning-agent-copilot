@@ -1,4 +1,4 @@
-import type { AgentStatus } from '@/types/agents'
+import type { AgentStatus } from '@orchestra/contract'
 
 /**
  * Live agent state, derived *only* from pulse departures — never from

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { cn } from '@/lib/utils'
-import type { AgentStatus } from '@/types/agents'
+import type { AgentStatus } from '@orchestra/contract'
 
 const STATUS_META: Record<AgentStatus, { label: string; color: string }> = {
   online: { label: 'ONLINE', color: 'var(--status-online)' },

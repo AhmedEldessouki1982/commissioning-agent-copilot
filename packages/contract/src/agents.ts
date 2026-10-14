@@ -1,9 +1,9 @@
 /**
- * Shared domain types for Agent Orchestra.
+ * Shared domain contract for Agent Orchestra.
  *
  * These are deliberately framework-agnostic (plain interfaces, no enums) so the
- * NestJS backend can mirror this exact file in Phase 2 and share the contract
- * over WebSocket/SSE without translation.
+ * NestJS backend can import this exact contract over WebSocket/SSE without
+ * translation. Types only — nothing here may emit runtime code.
  */
 
 export type AgentStatus = 'online' | 'busy' | 'idle' | 'error'

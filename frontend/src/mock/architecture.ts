@@ -1,4 +1,4 @@
-import type { Agent, Contract, Skill } from '@/types/agents'
+import type { Agent, Contract, Skill } from '@orchestra/contract'
 
 /**
  * Static architecture definition for Phase 1.

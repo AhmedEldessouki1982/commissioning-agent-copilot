@@ -4,7 +4,7 @@ import { GlitchText } from '@/components/hud/GlitchText'
 import { HudFrame } from '@/components/hud/HudFrame'
 import { StatusChip } from '@/components/hud/StatusChip'
 import { cn } from '@/lib/utils'
-import type { Agent, AgentStatus } from '@/types/agents'
+import type { Agent, AgentStatus } from '@orchestra/contract'
 import type { GraphNodeLayout } from './layout'
 
 export interface AgentNodeProps {

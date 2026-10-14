@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { useFitScale } from '@/hooks/useFitScale'
-import type { Agent, AgentStatus } from '@/types/agents'
+import type { Agent, AgentStatus } from '@orchestra/contract'
 import { AgentNode } from './AgentNode'
 import { GraphEdges } from './GraphEdges'
 import { PulseLayer } from './PulseLayer'

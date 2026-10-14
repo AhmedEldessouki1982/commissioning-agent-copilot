@@ -8,7 +8,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet'
-import type { Agent, AgentStatus } from '@/types/agents'
+import type { Agent, AgentStatus } from '@orchestra/contract'
 import type { PanelKey } from './layout'
 
 export interface DrawerTarget {

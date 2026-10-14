@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import type { PulseEvent } from '@/types/agents'
+import type { PulseEvent } from '@orchestra/contract'
 import type { AgentSeed, RuntimeState } from '@/lib/runtime-reducer'
 import { createRuntimeState, reduce } from '@/lib/runtime-reducer'
 import { PulseBus, type PulseInput } from '@/lib/pulse-bus'

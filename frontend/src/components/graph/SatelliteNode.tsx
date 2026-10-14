@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { FileText, Wrench } from 'lucide-react'
 import { HudFrame } from '@/components/hud/HudFrame'
-import type { Agent } from '@/types/agents'
+import type { Agent } from '@orchestra/contract'
 import type { PanelKey, SatelliteLayout } from './layout'
 
 export interface SatelliteNodeProps {

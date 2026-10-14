@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import { Terminal } from 'lucide-react'
 import { HudFrame } from '@/components/hud/HudFrame'
 import { cn } from '@/lib/utils'
-import type { ActivityLogEntry, PulseType } from '@/types/agents'
+import type { ActivityLogEntry, PulseType } from '@orchestra/contract'
 
 const TYPE_COLOR: Record<PulseType, string> = {
   dispatch: 'var(--pulse-dispatch)',

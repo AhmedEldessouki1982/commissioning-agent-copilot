@@ -1,7 +1,7 @@
 import { useEffect, useReducer, useState } from 'react'
 import { pulseBus } from '@/lib/pulse-bus'
 import { createRuntimeState, reduce } from '@/lib/runtime-reducer'
-import type { Agent, AgentStatus } from '@/types/agents'
+import type { Agent, AgentStatus } from '@orchestra/contract'
 
 export interface AgentRuntime {
   /** Live status per agent id (overrides the static seed). */

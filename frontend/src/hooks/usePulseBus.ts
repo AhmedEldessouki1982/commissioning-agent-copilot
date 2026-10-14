@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { pulseBus, type PulseInput } from '@/lib/pulse-bus'
-import type { PulseEvent } from '@/types/agents'
+import type { PulseEvent } from '@orchestra/contract'
 
 /** Emit a pulse onto the shared bus (used by the simulator and UI controls). */
 export function useEmitPulse(): (input: PulseInput) => PulseEvent {

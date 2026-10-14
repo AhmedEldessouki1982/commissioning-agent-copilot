@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { AgentStatus } from '@/types/agents'
+import type { AgentStatus } from '@orchestra/contract'
 import {
   createRuntimeState,
   reduce,

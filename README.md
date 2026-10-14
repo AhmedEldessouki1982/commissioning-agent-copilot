@@ -12,13 +12,16 @@ WebSocket/SSE.
 
 ```
 .
-├── frontend/   React + Vite + TypeScript + Tailwind v4 + shadcn/ui + Framer Motion
-└── backend/    NestJS API — GET /health + POST /{ic,mech,elec}-agent/ask
+├── frontend/           React + Vite + TypeScript + Tailwind v4 + shadcn/ui + Framer Motion
+├── backend/            NestJS API — GET /health + POST /{ic,mech,elec}-agent/ask
+└── packages/contract/  @orchestra/contract — shared domain types (types only)
 ```
 
-The domain contract (`Agent`, `Skill`, `Contract`, `PulseEvent`, …) lives in
-`frontend/src/types/agents.ts`. In Phase 2 it moves to a shared, types-only package that
-the backend consumes without maintaining a duplicate copy.
+The domain contract (`Agent`, `Skill`, `Contract`, `PulseEvent`, …) lives in the
+`@orchestra/contract` workspace package (`packages/contract`). It is **types only** — no
+runtime code and no build step — and the frontend imports it with `import type`, so nothing
+is pulled into the bundle. The backend adopts the same package in Phase 2 instead of
+maintaining a duplicate copy.
 
 ## Prerequisites
 

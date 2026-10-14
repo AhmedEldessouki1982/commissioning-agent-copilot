@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { formatClock } from '@/lib/format'
 import { pulseBus } from '@/lib/pulse-bus'
-import type { ActivityLogEntry, PulseEvent } from '@/types/agents'
+import type { ActivityLogEntry, PulseEvent } from '@orchestra/contract'
 
 export interface ActivityFeed {
   entries: ActivityLogEntry[]

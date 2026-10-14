@@ -1,6 +1,7 @@
 packages:
   - frontend
   - backend
+  - packages/*
 
 # Native/postinstall builds explicitly approved (pnpm v11 security default).
 allowBuilds:

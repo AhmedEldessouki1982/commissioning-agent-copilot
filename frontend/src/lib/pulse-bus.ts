@@ -1,4 +1,4 @@
-import type { PulseEvent, PulseType } from '@/types/agents'
+import type { PulseEvent, PulseType } from '@orchestra/contract'
 
 /** What a producer (simulator now, backend in Phase 2) hands to the bus. */
 export interface PulseInput {
