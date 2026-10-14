@@ -19,6 +19,11 @@ export const llmClientProvider: Provider = {
     if (!process.env.OPENROUTER_MODEL) {
       throw new Error('OPENROUTER_MODEL is not set');
     }
-    return new OpenAI({ apiKey, baseURL: 'https://openrouter.ai/api/v1' });
+    return new OpenAI({
+      apiKey,
+      baseURL: 'https://openrouter.ai/api/v1',
+      timeout: 60_000,
+      maxRetries: 1,
+    });
   },
 };

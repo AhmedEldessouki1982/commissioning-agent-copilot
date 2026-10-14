@@ -86,6 +86,47 @@ describe('ManagerAgentService', () => {
     expect(result.reason).toBe('rotating equipment');
   });
 
+  it('parses a decision preceded by prose', async () => {
+    complete.mockResolvedValue({
+      reply: 'Here is my decision: {"agent":"ic","reason":"loop checks"}',
+      model: TEST_MODEL,
+    });
+
+    const result = await service.ask('loop check question');
+
+    expect(icAsk).toHaveBeenCalledWith('loop check question');
+    expect(result.agent).toBe('ic');
+    expect(result.reason).toBe('loop checks');
+  });
+
+  it('parses a decision followed by prose', async () => {
+    complete.mockResolvedValue({
+      reply:
+        '{"agent":"mech","reason":"rotating equipment"} — that is my answer.',
+      model: TEST_MODEL,
+    });
+
+    const result = await service.ask('alignment question');
+
+    expect(mechAsk).toHaveBeenCalledWith('alignment question');
+    expect(result.agent).toBe('mech');
+    expect(result.reason).toBe('rotating equipment');
+  });
+
+  it('rejects a reply with no JSON object, without calling a specialist', async () => {
+    complete.mockResolvedValue({
+      reply: 'sorry, I cannot help with that',
+      model: TEST_MODEL,
+    });
+
+    await expect(service.ask('question')).rejects.toBeInstanceOf(
+      BadGatewayException,
+    );
+    expect(icAsk).not.toHaveBeenCalled();
+    expect(mechAsk).not.toHaveBeenCalled();
+    expect(elecAsk).not.toHaveBeenCalled();
+  });
+
   it('returns a fixed reply for "none" without calling a specialist', async () => {
     complete.mockResolvedValue({
       reply: '{"agent":"none","reason":"scheduling is out of scope"}',
